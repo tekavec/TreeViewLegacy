@@ -5,6 +5,12 @@ namespace TreeViewLegacy
 {
     public class TreeViewPalabrasClaveOpciones
     {
-        public static IList<TreeNode> Nodes { get; set; }
+        private static IList<TreeNode> _nodes = new List<TreeNode>();
+
+        public static IList<TreeNode> Nodes
+        {
+            get { return _nodes; }
+            set { _nodes = value; }
+        }
     }
 }
