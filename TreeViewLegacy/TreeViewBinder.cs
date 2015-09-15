@@ -1,13 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI.WebControls;
+using TreeViewLegacy.BoPage;
 
 namespace TreeViewLegacy
 {
     public class TreeViewBinder
     {
-        private void BindTreeView(IEnumerable<Option> OptionList, TreeNode parentNode)
+        private PageMode _pagemode;
+        private int _idKeyWord;
+
+        public void BindTreeView(IEnumerable<Opcion> optionList, TreeNode parentNode)
         {
-            var nodes = OptionList.Where(x => parentNode == null ? x.ParentID == 0 : x.ParentID == int.Parse(parentNode.Value));
+            var nodes = optionList.Where(x => parentNode == null ? x.ParentID == 0 : x.ParentID == int.Parse(parentNode.Value));
 
             if (_pagemode != BoPage.PageMode.View)
             {
@@ -31,7 +36,7 @@ namespace TreeViewLegacy
                         }
                         parentNode.ChildNodes.Add(newNode);
                     }
-                    BindTreeView(OptionList, newNode);
+                    BindTreeView(optionList, newNode);
                 }
 
             }
@@ -64,13 +69,18 @@ namespace TreeViewLegacy
                             }
 
                         }
-                        BindTreeView(OptionList, newNode);
+                        BindTreeView(optionList, newNode);
                     }
                 }
 
             }
 
 
+        }
+
+        private bool ExistKeyWord(Opcion node)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
