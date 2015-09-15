@@ -12,24 +12,22 @@ namespace TreeViewLegacy
 
         public void BindTreeView(IEnumerable<Opcion> optionList, TreeNode parentNode)
         {
-            var nodes = optionList.Where(x => parentNode == null ? x.ParentID == 0 : x.ParentID == int.Parse(parentNode.Value));
-
+            var opcions =
+                optionList.Where(x => parentNode == null 
+                    ? x.ParentID == 0 
+                    : x.ParentID == int.Parse(parentNode.Value));
             if (_pagemode != BoPage.PageMode.View)
             {
-                foreach (Opcion node in nodes)
+                foreach (Opcion opcion in opcions)
                 {
-                    TreeNode newNode = new TreeNode();
-                    newNode.Text = (node.ParentID == 0) ? string.Format(@"<span class=""Tema"" id=""Tema{0}"">{1}</span>", node.OpcionID.ToString(), node.Descripcion.ToString()) : string.Format(@"<span class=""SubTema"">{1}</span>", node.ParentID.ToString(), node.Descripcion.ToString());
-                    newNode.Value = node.OpcionID.ToString();
-                    newNode.ToolTip = node.Descripcion.ToString();
-
+                    var newNode = CreateTreeNode(opcion);
                     if (parentNode == null)
                     {
                         TreeViewPalabrasClaveOpciones.Nodes.Add(newNode);
                     }
                     else
                     {
-                        if (node.PalabrasClaveOpciones.Where(c => c.KeywordID == _idKeyWord).Count() > 0)
+                        if (opcion.PalabrasClaveOpciones.Where(c => c.KeywordID == _idKeyWord).Count() > 0)
                         {
                             newNode.Checked = true;
                             parentNode.Expand();
@@ -38,47 +36,59 @@ namespace TreeViewLegacy
                     }
                     BindTreeView(optionList, newNode);
                 }
-
             }
             else
             {
-                foreach (Opcion node in nodes)
+                foreach (Opcion opcion in opcions)
                 {
-                    if (ExistKeyWord(node))
+                    if (ExistKeyWord(opcion))
                     {
-                        TreeNode newNode = new TreeNode();
-                        newNode.Text = (node.ParentID == 0) ? string.Format(@"<span class=""Tema"" id=""Tema{0}"">{1}</span>", node.OpcionID.ToString(), node.Descripcion.ToString()) : string.Format(@"<span class=""SubTema"">{1}</span>", node.ParentID.ToString(), node.Descripcion.ToString());
-                        newNode.Value = node.OpcionID.ToString();
-                        newNode.ToolTip = node.Descripcion.ToString();
-
+                        var newNode = CreateTreeNode(opcion);
                         if (parentNode == null)
                         {
                             TreeViewPalabrasClaveOpciones.Nodes.Add(newNode);
                         }
                         else
                         {
-                            if (node.PalabrasClaveOpciones.Where(c => c.KeywordID == _idKeyWord).Count() > 0)
+                            if (opcion.PalabrasClaveOpciones.Where(c => c.KeywordID == _idKeyWord).Count() > 0)
                             {
                                 newNode.Checked = true;
                                 parentNode.Expand();
                             }
-
-                            if (node.PalabrasClaveOpciones.Where(c => c.KeywordID == _idKeyWord).Count() > 0)
+                            if (opcion.PalabrasClaveOpciones.Where(c => c.KeywordID == _idKeyWord).Count() > 0)
                             {
                                 parentNode.ChildNodes.Add(newNode);
                             }
-
                         }
                         BindTreeView(optionList, newNode);
                     }
                 }
-
             }
-
-
         }
 
-        private bool ExistKeyWord(Opcion node)
+        public TreeNode CreateTreeNode(Opcion node)
+        {
+            return new TreeNode
+            {
+                Text = DetermineTextValueForNode(node),
+                Value = node.OpcionID.ToString(),
+                ToolTip = node.Descripcion
+            };
+        }
+
+        private string DetermineTextValueForNode(Opcion node)
+        {
+            return (node.ParentID == 0)
+                ? string.Format(
+                    @"<span class=""Tema"" id=""Tema{0}"">{1}</span>",
+                    node.OpcionID,
+                    node.Descripcion)
+                : string.Format(
+                    @"<span class=""SubTema"">{0}</span>",
+                    node.Descripcion);
+        }
+
+        public bool ExistKeyWord(Opcion node)
         {
             throw new System.NotImplementedException();
         }
